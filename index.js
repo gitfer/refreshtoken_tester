@@ -20,14 +20,19 @@ var requireNewAccessTokenViaRefreshToken = function () {
 
   if(retryCount < config.api.require_new_access_token_via_refresh_token ){
     
+    console.log(colors.red('Authorization has been denied. I\'m gonna try with refresh token ' + config.api.request_new_token_via_refresh_token_delay + ' seconds from now' , token.token.refresh_token));
     console.log( '=========== '.green + (retryCount+1) + ' time ============= '.green + token.token.refresh_token.substring(0, 8));    
 
     token.refresh(function(error, result) {
+
+      retryCount = retryCount + 1;
+      
       if(error !== null){
         console.log(colors.red('ERROR ', JSON.stringify(error)));
+        console.log(colors.red('Stopped on ' + retryCount + '/' + config.api.require_new_access_token_via_refresh_token + ' for expired token'));
+        
         process.exit()
       }
-      retryCount = retryCount + 1;
       console.log('new Token --> access_token'.green, result.token.access_token);
       console.log('             --> refresh_token'.green, result.token.refresh_token);
 
@@ -50,7 +55,6 @@ var handleResourceResult = function (err, data) {
   if(err !== null){
     console.log(colors.red('ERROR ', JSON.stringify(err)));
     if(err.message && err.message === 'Authorization has been denied for this request.'){
-        console.log(colors.red('Authorization has been denied. I\'m gonna try with refresh token ' + config.api.request_new_token_via_refresh_token_delay + ' seconds from now' , token.token.refresh_token));
         setTimeout(function () {
           requireNewAccessTokenViaRefreshToken();    
         }, config.api.request_new_token_via_refresh_token_delay);
