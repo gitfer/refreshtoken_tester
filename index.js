@@ -26,7 +26,7 @@ var requireNewAccessTokenViaRefreshToken = function () {
     token.refresh(function(error, result) {
 
       retryCount = retryCount + 1;
-      
+
       if(error !== null){
         console.log(colors.red('ERROR ', JSON.stringify(error)));
         console.log(colors.red('Stopped on ' + retryCount + '/' + config.api.require_new_access_token_via_refresh_token + ' for expired token'));
@@ -35,6 +35,7 @@ var requireNewAccessTokenViaRefreshToken = function () {
       }
       console.log('new Token --> access_token'.green, result.token.access_token);
       console.log('             --> refresh_token'.green, result.token.refresh_token);
+      console.log('             --> result'.green, result);
 
       token = result;
 
@@ -86,7 +87,7 @@ var saveToken = function (error, result) {
     console.log( colors.red('error_description: ', error.error_description)); 
   }
   token = oauth2.accessToken.create(result);
-  console.log( 'Token found!', JSON.stringify(token));
+  console.log( 'Token found!', token);
 
   callResource({ method: config.api.test_method, resource: '/api/' + config.api.test_resource});
 };
